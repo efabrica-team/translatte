@@ -1,0 +1,16 @@
+{
+  "name": "efabrica/translatte",
+  "type": "library",
+  "description": "Translator for Nette framework",
+  "keywords": ["translator", "nette"],
+  "license": "MIT",
+  "require": {
+    "php": ">= 7.1",
+    "nette/utils": "^3.0",
+    "nette/finder": "^2.5",
+    "nette/neon": "^3.0"
+  },
+  "autoload": {
+  "classmap": ["src/"]
+  }
+}
