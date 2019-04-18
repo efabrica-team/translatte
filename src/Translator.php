@@ -79,6 +79,11 @@ class Translator implements ITranslator
         $message = (string) $message;
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
+        // If wrong input arguments passed, return message key
+        if (!is_int($count) || !is_array($params) || !is_string($lang)) {
+            return $message; // @ maybe throw exception?
+        }
+
         $translation = $this->getDictionary($lang)->findTranslation($message);
         if ($translation === null) {
             // Try find translation in fallback languages

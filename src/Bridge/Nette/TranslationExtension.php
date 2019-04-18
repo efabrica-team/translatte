@@ -13,14 +13,14 @@ use Nette\Localization\ITranslator;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\DI\Definitions\Statement;
-use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\ServiceDefinition;
 use Nette\DI\Definitions\FactoryDefinition;
 
 class TranslationExtension extends CompilerExtension
 {
     public function getConfigSchema(): Schema
     {
-        return Expect::array()->default([
+        return Expect::structure([
             'default' => Expect::string()->required(),
             'fallback' => Expect::arrayOf('string'),
             'dirs' => Expect::arrayOf('string'),
@@ -35,12 +35,12 @@ class TranslationExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         // Prepare params for translator
-        $params = ['defaultLang' => $this->config['default']];
-        if (!empty($this->config['resolvers'])) {
-            $params['resolver'] = new Statement(ChainResolver::class, [$this->config['resolvers']]);
+        $params = ['defaultLang' => $this->config->default];
+        if (!empty($this->config->resolvers)) {
+            $params['resolver'] = new Statement(ChainResolver::class, [$this->config->resolvers]);
         }
-        if ($this->config['cache']) {
-            $params['cache'] = $this->config['cache'];
+        if ($this->config->cache) {
+            $params['cache'] = $this->config->cache;
         }
 
         $translator = $builder->addDefinition($this->prefix('translator'))
@@ -48,14 +48,14 @@ class TranslationExtension extends CompilerExtension
             ->setFactory(Translator::class, $params);
 
         // Configure translator
-        foreach ($this->config['resources'] as $resource) {
+        foreach ($this->config->resources as $resource) {
             $translator->addSetup('addResource', [$resource]);
         }
-        if (!empty($this->config['fallback'])) {
-            $translator->addSetup('setFallbackLanguages', [$this->config['fallback']]);
+        if (!empty($this->config->fallback)) {
+            $translator->addSetup('setFallbackLanguages', [$this->config->fallback]);
         }
-        if (!empty($this->config['dirs'])) {
-            $translator->addSetup('addResource', [new Statement(NeonDirectoryResource::class, [$this->config['dirs']])]);
+        if (!empty($this->config->dirs)) {
+            $translator->addSetup('addResource', [new Statement(NeonDirectoryResource::class, [$this->config->dirs])]);
         }
     }
     public function beforeCompile(): void
