@@ -11,19 +11,14 @@ before_script:
   - composer update ${COMPOSER_FLAGS} --no-interaction
 
 script:
-  - mkdir -p build/logs
-  - mkdir temp
   - composer outdated -D --strict
   - composer require phpunit/phpunit --dev
   - composer require phpstan/phpstan --dev
   - composer require squizlabs/php_codesniffer --dev
   - vendor/bin/phpstan analyze src tests --level=max
   - vendor/bin/phpcs src tests --standard=PSR2 -n
-  - vendor/bin/phpunit --coverage-text
+  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_success:
   - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
-  - wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar
-  - chmod +x php-coveralls.phar
-  - travis_retry php php-coveralls.phar -x build/logs/clover.xml
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
