@@ -1,5 +1,9 @@
 # Translatte
 
+[![Build Status](https://travis-ci.org/efabrica-team/translatte.svg?branch=master)](https://travis-ci.org/efabrica-team/translatte)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/efabrica-team/translatte/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/efabrica-team/translatte/?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/efabrica-team/translatte/badge.svg)](https://coveralls.io/github/efabrica-team/translatte)
+
 Translator for Nette framework.
 
 ## Usage

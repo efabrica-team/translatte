@@ -1,0 +1,42 @@
+app:
+    article:
+        actions: Akcie
+        are_you_sure_you_want_to_delete_article: Naozaj chcete odstrániť článok <strong>%articleTitle%</strong>?
+        articles: Články
+        author: Autor
+        beware_you_work_with_live_database_deleting_article_is_irreversible_operation: "Pozor, pracujete s ostrou databázou! Odstránenie článku je nevratná operácia."
+        categories_keywords: Kategórie / Kľúčové slová
+        category: Kategórie
+        close: Zavrieť
+        delete_article: Odstránenie článku
+        edit: Upraviť
+        edit_article: Úprava článku
+        history: História
+        name_author: Názov / Autor
+        new_article: Nový článok
+        no_records_found: Nebol nájdený žiadny záznam
+        no_filter_matching_record_found: Nebol nájdený žiadny záznam vyhovujúci filtru
+        create_record: Pridať článok
+        preview: Náhľad
+        published: Publikovaný
+        read_count: Počet prečítaní
+        remove: Odstrániť
+        start: Začiatok
+        status: Stav
+        update: Aktualizácia
+        articles_count: článok|články|článkov
+        articles_count_with_placeholder: %count% článok|%count% články|%count% článkov
+        articles_count_with_params: článok v kategórii %category% a sekcii %section%|články v kategórii %category% a sekcii %section%|článkov v kategórii %category% a sekcii %section%
+
+    author:
+        are_you_sure_you_want_to_remove_author_authorname: Naozaj chcete odstrániť autora <strong>%authorName%</strong>?
+        author_articles: Články autora
+        authors: Autori
+        beware_you_work_with_live_database_removing_author_is_irreversible_operation: "Pozor, pracujete s ostrou databázou! Odstránenie autora je nevratná operácia."
+        edit_author: Úprava autora
+        new_author: Nový autor
+        no_records_found: Nebol nájdený žiadny záznam
+        no_filter_matching_record_found: Nebol nájdený žiadny záznam vyhovujúci filtru
+        create_record: Pridať autora
+        remove: Odstrániť
+        removing_author: Odstránenie autora
