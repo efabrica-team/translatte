@@ -1,0 +1,42 @@
+app:
+    article:
+        actions: Actions
+        are_you_sure_you_want_to_delete_article: Are you sure you want to delete the article <strong>%articleTitle%</strong>?
+        articles: Articles
+        author: Author
+        beware_you_work_with_live_database_deleting_article_is_irreversible_operation: "Beware, you work with a live database! Deleting an article is a irreversible operation."
+        categories_keywords: Categories / Keywords
+        category: Category
+        close: Close
+        delete_article: Delete an article
+        edit: Edit
+        edit_article: Article edit
+        history: History
+        name_author: Title / author
+        new_article: New article
+        no_records_found: No records found
+        no_filter_matching_record_found: No filter matching record found
+        create_record: Create article
+        preview: Preview
+        published: Published
+        read_count: Read count
+        remove: Remove
+        start: Start
+        status: Status
+        update: Update
+        articles_count: article|articles
+        articles_count_with_placeholder: %count% article|%count% articles
+        articles_count_with_params: article in category %category% and section %section%|articles in category %category% and section %section%|
+
+    author:
+        are_you_sure_you_want_to_remove_author_authorname: Are you sure you want to remove the author <strong>%authorName%</strong>?
+        author_articles: Author's articles
+        authors: Authors
+        beware_you_work_with_live_database_removing_author_is_irreversible_operation: "Beware, you work with a live database! Removing the author is a irreversible operation."
+        edit_author: Author edit
+        new_author: New author
+        no_records_found: No records found
+        no_filter_matching_record_found: No filter matching record found
+        create_record: Create author
+        remove: Remove
+        removing_author: Removing the author

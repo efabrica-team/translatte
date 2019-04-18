@@ -10,6 +10,7 @@ use Efabrica\Translatte\Resolver\IResolver;
 use Efabrica\Translatte\Resolver\StaticResolver;
 use Efabrica\Translatte\Resource\IResource;
 use Nette\Localization\ITranslator;
+use InvalidArgumentException;
 
 class Translator implements ITranslator
 {
@@ -22,7 +23,7 @@ class Translator implements ITranslator
     /** @var IResolver */
     private $resolver;
 
-    /** @var */
+    /** @var ICache */
     private $cache;
 
     /** @var array */
@@ -66,7 +67,7 @@ class Translator implements ITranslator
 
     /**
      * Provide translation
-     * @param $message
+     * @param string|int $message
      * @param mixed ...$parameters
      * @return string
      */
@@ -75,6 +76,7 @@ class Translator implements ITranslator
         // translate($message, int $count, array $params, string $lang = null)
         // translate($message, array $params, string $lang = null)
 
+        $message = (string) $message;
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
         $translation = $this->getDictionary($lang)->findTranslation($message);
@@ -143,23 +145,28 @@ class Translator implements ITranslator
         if (!count($parameters)) {
             return [
                 'count' => 1,
-                'params' => [],
+                'params' => ['count' => 1],
                 'lang' => $this->getResolvedLang()
             ];
         }
 
         if (is_array($parameters[0])) {
             return [
-                'count' => 1,
+                'count' => isset($parameters[0]['count']) ? $parameters[0]['count'] : 1,
                 'params' => $parameters[0],
                 'lang' => array_key_exists(1, $parameters) ? $parameters[1] : $this->getResolvedLang()
             ];
         }
 
+        $params = array_key_exists(1, $parameters) ? $parameters[1] : [];
+        if (!isset($params['count'])) {
+            $params['count'] = $parameters[0];
+        }
+
         return [
             'count' => $parameters[0],
-            'params' => array_key_exists(1, $parameters) ? $parameters[1] : [],
-            'lang' => array_key_exists(2, $parameters) ? $parameters[1] : $this->getResolvedLang()
+            'params' => $params,
+            'lang' => array_key_exists(2, $parameters) ? $parameters[2] : $this->getResolvedLang()
         ];
     }
 
@@ -172,7 +179,6 @@ class Translator implements ITranslator
         if ($this->lang === null) {
             $resolvedLang = $this->resolver->resolve();
             $this->lang = $resolvedLang !== null ? $resolvedLang : $this->defaultLang;
-
         }
         return $this->lang;
     }
@@ -198,8 +204,8 @@ class Translator implements ITranslator
         foreach ($this->resources as $resource) {
             $dictionaries = $resource->load($lang);
             foreach ($dictionaries as $dictionary) {
-                if ($dictionary instanceof Dictionary) {
-                    // @TODO: throw exception
+                if (!$dictionary instanceof Dictionary) {
+                    throw new InvalidArgumentException(sprintf("%s expected. Resource returned %s", Dictionary::class, get_class($dictionary)));
                 }
                 $this->dictionaries[$lang]->extend($dictionary);
             }

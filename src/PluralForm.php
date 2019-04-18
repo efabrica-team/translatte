@@ -8,12 +8,13 @@ class PluralForm
 {
     public static function get(int $number, string $lang): int
     {
-        if ('pt_BR' === $lang) {
+        if ($lang === 'pt_BR') {
             // temporary set a locale for brazilian
             $lang = 'xbr';
         }
+
         if (strlen($lang) > 3) {
-            $lang = substr($lang, 0, -strlen(strrchr($lang, '_')));
+            $lang = substr($lang, 0, -strlen((string) strrchr($lang, '_')));
         }
 
         switch ($lang) {

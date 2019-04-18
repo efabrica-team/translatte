@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Efabrica\Translatte;
 
 use Efabrica\Translatte\Helper\Arr;
+use InvalidArgumentException;
 
 class Dictionary
 {
@@ -31,7 +32,7 @@ class Dictionary
     public function extend(Dictionary $dictionary): void
     {
         if ($this->lang !== $dictionary->getLang()) {
-            throw new \Exception(); // @TODO
+            throw new InvalidArgumentException(sprintf("Current dictionary lang (%s) does not match to extend dictionary lang (%s)", $this->lang, $dictionary->getLang()));
         }
 
         $this->records = array_merge($this->records, $dictionary->getRecords());

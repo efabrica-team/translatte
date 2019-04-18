@@ -10,7 +10,18 @@
     "nette/finder": "^2.5",
     "nette/neon": "^3.0"
   },
+  "require-dev": {
+    "nette/application": "^3.0",
+    "nette/di": "^3.0"
+  },
+  "suggest": {
+    "nette/application": "For Nette bridge - TranslationExtension",
+    "nette/di": "For Nette bridge - TranslationExtension"
+  },
   "autoload": {
-  "classmap": ["src/"]
+    "classmap": ["src/"]
+  },
+  "autoload-dev": {
+    "classmap": ["tests/"]
   }
 }
