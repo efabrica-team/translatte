@@ -64,7 +64,7 @@ translation:
 
 ```
 cart:
-    products_in_cart: 'V košíku je jeden produkt|V košíku sú %count% produktov|V košíku je %count% produktov'
+    products_in_cart: 'V košíku je jeden produkt|V košíku sú %count% produkty|V košíku je %count% produktov'
 ```
 
 **Source: src/PluralForm.php**
