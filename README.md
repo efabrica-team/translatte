@@ -67,6 +67,15 @@ cart:
     products_in_cart: 'V košíku je jeden produkt|V košíku sú %count% produktov|V košíku je %count% produktov'
 ```
 
+**Source: src/PluralForm.php**
+
+```
+Example of count syntax:
+sk: '1|2-4|0,5-Inf'
+cz: '1|2-4|0,5-Inf'
+en: '1|0,2-Inf'
+```
+
 **index.php**:
 ```
 // Translator setup
