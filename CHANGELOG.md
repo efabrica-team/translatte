@@ -1,6 +1,8 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+#### Fixed
+- fix cache store
 
 ### [1.0.0] - 2019-04-26
 - first released version

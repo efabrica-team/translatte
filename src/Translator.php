@@ -32,7 +32,7 @@ class Translator implements ITranslator
     /** @var array */
     private $fallbackLanguages = [];
 
-    /** @var array */
+    /** @var Dictionary[] */
     private $dictionaries = [];
 
     public function __construct(
@@ -209,6 +209,7 @@ class Translator implements ITranslator
         foreach ($this->resources as $resource) {
             $dictionaries = $resource->load($lang);
             foreach ($dictionaries as $dictionary) {
+                $this->cache->store($lang, $dictionary->getRecords());
                 if (!$dictionary instanceof Dictionary) {
                     throw new InvalidArgumentException(sprintf("%s expected. Resource returned %s", Dictionary::class, get_class($dictionary)));
                 }
