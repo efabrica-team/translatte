@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte\Cache;
 
+use Efabrica\Translatte\Dictionary;
+
 class NullCache implements ICache
 {
     public function store(string $lang, array $data): void
@@ -11,7 +13,7 @@ class NullCache implements ICache
         // Nothing to do
     }
 
-    public function load(string $lang): ?array
+    public function load(string $lang): ?Dictionary
     {
         return null;
     }
