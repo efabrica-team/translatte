@@ -9,12 +9,12 @@ use Efabrica\Translatte\Resource\NeonDirectoryResource;
 use Efabrica\Translatte\Translator;
 use Nette\Application\UI\ITemplateFactory;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\FactoryDefinition;
+use Nette\DI\Definitions\Statement;
+use Nette\DI\ServiceDefinition;
 use Nette\Localization\ITranslator;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Nette\DI\Definitions\Statement;
-use Nette\DI\ServiceDefinition;
-use Nette\DI\Definitions\FactoryDefinition;
 
 class TranslationExtension extends CompilerExtension
 {
@@ -26,7 +26,8 @@ class TranslationExtension extends CompilerExtension
             'dirs' => Expect::arrayOf('string'),
             'cache' => Expect::type(Statement::class),
             'resolvers' => Expect::arrayOf(Statement::class),
-            'resources' => Expect::arrayOf(Statement::class)
+            'resources' => Expect::arrayOf(Statement::class),
+            'currentTranslate' => Expect::type(Statement::class)
         ]);
     }
 
@@ -41,6 +42,9 @@ class TranslationExtension extends CompilerExtension
         }
         if ($this->config->cache) {
             $params['cache'] = $this->config->cache;
+        }
+        if ($this->config->currentTranslate) {
+            $params['currentTranslate'] = $this->config->currentTranslate;
         }
 
         $translator = $builder->addDefinition($this->prefix('translator'))
@@ -58,6 +62,7 @@ class TranslationExtension extends CompilerExtension
             $translator->addSetup('addResource', [new Statement(NeonDirectoryResource::class, [$this->config->dirs])]);
         }
     }
+
     public function beforeCompile(): void
     {
         $builder = $this->getContainerBuilder();
