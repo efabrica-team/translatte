@@ -6,18 +6,20 @@ namespace Efabrica\Translatte;
 
 use Efabrica\Translatte\Cache\ICache;
 use Efabrica\Translatte\Cache\NullCache;
+use Efabrica\Translatte\CurrentTranslate\DumbCurrentTranslate;
+use Efabrica\Translatte\CurrentTranslate\ICurrentTranslate;
 use Efabrica\Translatte\Resolver\IResolver;
 use Efabrica\Translatte\Resolver\StaticResolver;
 use Efabrica\Translatte\Resource\IResource;
-use Nette\Localization\ITranslator;
 use InvalidArgumentException;
+use Nette\Localization\ITranslator;
 
 class Translator implements ITranslator
 {
     /** @var string */
     private $defaultLang;
 
-    /** @var string  */
+    /** @var string */
     private $lang;
 
     /** @var IResolver */
@@ -25,6 +27,9 @@ class Translator implements ITranslator
 
     /** @var ICache */
     private $cache;
+
+    /** @var ICurrentTranslate */
+    private $currentTranslate;
 
     /** @var array */
     private $resources = [];
@@ -38,11 +43,14 @@ class Translator implements ITranslator
     public function __construct(
         string $defaultLang,
         IResolver $resolver = null,
-        ICache $cache = null
+        ICache $cache = null,
+        ICurrentTranslate $currentTranslate = null
     ) {
         $this->defaultLang = $defaultLang;
         $this->resolver = $resolver ?: new StaticResolver($defaultLang);
         $this->cache = $cache ?: new NullCache();
+        $this->currentTranslate = $currentTranslate ?: new DumbCurrentTranslate();
+        $this->currentTranslate->init();
     }
 
     /**
@@ -81,6 +89,7 @@ class Translator implements ITranslator
 
         // If wrong input arguments passed, return message key
         if (!is_int($count) || !is_array($params) || !is_string($lang)) {
+            $this->currentTranslateStore($message, $message, $lang, (int) strval($count), (array) $params);
             return $message; // @ maybe throw exception?
         }
 
@@ -96,6 +105,7 @@ class Translator implements ITranslator
 
             // If translation not found in base either fallback languages return message key
             if ($translation === null) {
+                $this->currentTranslateStore($message, $translation, $lang, $count, $params);
                 return $message;
             }
         }
@@ -103,7 +113,28 @@ class Translator implements ITranslator
         $translation = $this->selectRightPluralForm($translation, $lang, $count);
         $translation = $this->replaceParams($translation, $params);
 
+        $this->currentTranslateStore($message, $translation, $lang, $count, $params);
         return $translation;
+    }
+
+    /**
+     * Store current translate parameters
+     * @param string $message
+     * @param string|null $translation
+     * @param string $lang
+     * @param int $count
+     * @param array $params
+     * @return void
+     */
+    private function currentTranslateStore(string $message, ?string $translation, string $lang, int $count, array $params): void
+    {
+        $this->currentTranslate->store([
+            'message' => $message,
+            'translation' => $translation ?? '',
+            'lang' => $lang,
+            'count' => $count,
+            'params' => $params
+        ]);
     }
 
     /**
@@ -134,7 +165,7 @@ class Translator implements ITranslator
     {
         $transParams = [];
         foreach ($params as $key => $value) {
-            $transParams["%" . $key . "%"] = $value;
+            $transParams['%' . $key . '%'] = $value;
         }
 
         return strtr($translation, $transParams);
@@ -211,7 +242,7 @@ class Translator implements ITranslator
             foreach ($dictionaries as $dictionary) {
                 $this->cache->store($lang, $dictionary->getRecords());
                 if (!$dictionary instanceof Dictionary) {
-                    throw new InvalidArgumentException(sprintf("%s expected. Resource returned %s", Dictionary::class, get_class($dictionary)));
+                    throw new InvalidArgumentException(sprintf('%s expected. Resource returned %s', Dictionary::class, get_class($dictionary)));
                 }
                 $this->dictionaries[$lang]->extend($dictionary);
             }
