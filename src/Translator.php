@@ -6,7 +6,7 @@ namespace Efabrica\Translatte;
 
 use Efabrica\Translatte\Cache\ICache;
 use Efabrica\Translatte\Cache\NullCache;
-use Efabrica\Translatte\CurrentTranslate\DumpCurrentTranslate;
+use Efabrica\Translatte\CurrentTranslate\DumbCurrentTranslate;
 use Efabrica\Translatte\CurrentTranslate\ICurrentTranslate;
 use Efabrica\Translatte\Resolver\IResolver;
 use Efabrica\Translatte\Resolver\StaticResolver;
@@ -49,7 +49,7 @@ class Translator implements ITranslator
         $this->defaultLang = $defaultLang;
         $this->resolver = $resolver ?: new StaticResolver($defaultLang);
         $this->cache = $cache ?: new NullCache();
-        $this->currentTranslate = $currentTranslate ?: new DumpCurrentTranslate();
+        $this->currentTranslate = $currentTranslate ?: new DumbCurrentTranslate();
         $this->currentTranslate->init();
     }
 

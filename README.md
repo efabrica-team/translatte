@@ -57,7 +57,7 @@ translation:
     resources: # optional
         - Efabrica\Translatte\Resource\NeonDirectoryResource(%appDir%/localize)
     currentTranslate: # optional
-        - Efabrica\TranslatteTranska\CurrentTranslate\DumpCurrentTranslate()
+        - Efabrica\TranslatteTranska\CurrentTranslate\DumbCurrentTranslate()
 ```
 
 ### Syntactic sugar

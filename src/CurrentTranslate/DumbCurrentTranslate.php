@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte\CurrentTranslate;
 
-class DumpCurrentTranslate implements ICurrentTranslate
+class DumbCurrentTranslate implements ICurrentTranslate
 {
     public function init(): void
     {
