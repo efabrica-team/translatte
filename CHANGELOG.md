@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- add invoke onTranslate
+
 ### [1.0.1] - 2022-03-04
 #### Fixed
 - fix cache store

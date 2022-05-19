@@ -24,12 +24,12 @@ class NeonDirectoryResource implements IResource
     {
         $directories = [];
 
-        foreach (Finder::find("*.*.neon")->from($this->directories) as $file) {
+        foreach (Finder::find('*.*.neon')->from($this->directories) as $file) {
             if (!preg_match('~^(?P<prefix>.*?)\.(?P<lang>[^\.]+)\.(?P<format>[^\.]+)$~', $file->getFilename(), $matches)) {
                 continue;
             }
 
-            $resource = new NeonResource($file->getPathname(), $matches['lang'], in_array($matches['prefix'], $this->ignoredPrefixes) ? '' : $matches['prefix'] . ".");
+            $resource = new NeonResource($file->getPathname(), $matches['lang'], in_array($matches['prefix'], $this->ignoredPrefixes) ? '' : $matches['prefix'] . '.');
             $directories = array_merge($directories, $resource->load($lang));
         }
 

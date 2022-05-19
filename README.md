@@ -37,7 +37,7 @@ $translator->translate('key', 1, [], 'en_US');
 ### Nette extension
 ```
 extensions:
-	translation: Efabrica\Translatte\DI\TranslationExtension
+	translation: Efabrica\Translatte\Bridge\Nette\TranslationExtension
 	
 # Minimal configuration
 translation:
@@ -54,7 +54,7 @@ translation:
     cache: Efabrica\Translatte\Cache\NullCache() # optional
     resolvers: # optional
         - Efabrica\Translatte\Resolver\StaticResolver('sk_Sk')
-    resources: #optional
+    resources: # optional
         - Efabrica\Translatte\Resource\NeonDirectoryResource(%appDir%/localize)
 ```
 
