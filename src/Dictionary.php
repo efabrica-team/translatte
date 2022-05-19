@@ -32,7 +32,7 @@ class Dictionary
     public function extend(Dictionary $dictionary): void
     {
         if ($this->lang !== $dictionary->getLang()) {
-            throw new InvalidArgumentException(sprintf("Current dictionary lang (%s) does not match to extend dictionary lang (%s)", $this->lang, $dictionary->getLang()));
+            throw new InvalidArgumentException(sprintf('Current dictionary lang (%s) does not match to extend dictionary lang (%s)', $this->lang, $dictionary->getLang()));
         }
 
         $this->records = array_merge($this->records, $dictionary->getRecords());

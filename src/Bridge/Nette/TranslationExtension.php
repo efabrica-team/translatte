@@ -9,12 +9,12 @@ use Efabrica\Translatte\Resource\NeonDirectoryResource;
 use Efabrica\Translatte\Translator;
 use Nette\Application\UI\ITemplateFactory;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\FactoryDefinition;
+use Nette\DI\Definitions\Statement;
+use Nette\DI\ServiceDefinition;
 use Nette\Localization\ITranslator;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Nette\DI\Definitions\Statement;
-use Nette\DI\ServiceDefinition;
-use Nette\DI\Definitions\FactoryDefinition;
 
 class TranslationExtension extends CompilerExtension
 {
@@ -58,6 +58,7 @@ class TranslationExtension extends CompilerExtension
             $translator->addSetup('addResource', [new Statement(NeonDirectoryResource::class, [$this->config->dirs])]);
         }
     }
+
     public function beforeCompile(): void
     {
         $builder = $this->getContainerBuilder();

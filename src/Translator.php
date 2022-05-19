@@ -9,8 +9,9 @@ use Efabrica\Translatte\Cache\NullCache;
 use Efabrica\Translatte\Resolver\IResolver;
 use Efabrica\Translatte\Resolver\StaticResolver;
 use Efabrica\Translatte\Resource\IResource;
-use Nette\Localization\ITranslator;
 use InvalidArgumentException;
+use Nette\Localization\ITranslator;
+use Nette\Utils\Arrays;
 
 class Translator implements ITranslator
 {
@@ -34,6 +35,9 @@ class Translator implements ITranslator
 
     /** @var Dictionary[] */
     private $dictionaries = [];
+
+    /** @var array */
+    public $onTranslate = [];
 
     public function __construct(
         string $defaultLang,
@@ -81,6 +85,7 @@ class Translator implements ITranslator
 
         // If wrong input arguments passed, return message key
         if (!is_int($count) || !is_array($params) || !is_string($lang)) {
+            Arrays::invoke($this->onTranslate, $this, $message, $message, $lang, (int) strval($count), (array) $params);
             return $message; // @ maybe throw exception?
         }
 
@@ -96,6 +101,7 @@ class Translator implements ITranslator
 
             // If translation not found in base either fallback languages return message key
             if ($translation === null) {
+                Arrays::invoke($this->onTranslate, $this, $message, $translation, $lang, $count, $params);
                 return $message;
             }
         }
@@ -103,6 +109,7 @@ class Translator implements ITranslator
         $translation = $this->selectRightPluralForm($translation, $lang, $count);
         $translation = $this->replaceParams($translation, $params);
 
+        Arrays::invoke($this->onTranslate, $this, $message, $translation, $lang, $count, $params);
         return $translation;
     }
 
@@ -134,7 +141,7 @@ class Translator implements ITranslator
     {
         $transParams = [];
         foreach ($params as $key => $value) {
-            $transParams["%" . $key . "%"] = $value;
+            $transParams['%' . $key . '%'] = $value;
         }
 
         return strtr($translation, $transParams);
@@ -211,7 +218,7 @@ class Translator implements ITranslator
             foreach ($dictionaries as $dictionary) {
                 $this->cache->store($lang, $dictionary->getRecords());
                 if (!$dictionary instanceof Dictionary) {
-                    throw new InvalidArgumentException(sprintf("%s expected. Resource returned %s", Dictionary::class, get_class($dictionary)));
+                    throw new InvalidArgumentException(sprintf('%s expected. Resource returned %s', Dictionary::class, get_class($dictionary)));
                 }
                 $this->dictionaries[$lang]->extend($dictionary);
             }
