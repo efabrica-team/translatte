@@ -18,7 +18,7 @@ class Translator implements ITranslator
     /** @var string */
     private $defaultLang;
 
-    /** @var string  */
+    /** @var string */
     private $lang;
 
     /** @var IResolver */
@@ -80,12 +80,12 @@ class Translator implements ITranslator
         // translate($message, int $count, array $params, string $lang = null)
         // translate($message, array $params, string $lang = null)
 
-        $message = (string) $message;
+        $message = (string)$message;
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
         // If wrong input arguments passed, return message key
         if (!is_int($count) || !is_array($params) || !is_string($lang)) {
-            Arrays::invoke($this->onTranslate, $this, $message, $message, $lang, (int) strval($count), (array) $params);
+            Arrays::invoke($this->onTranslate, $this, $message, $message, $lang, (int)strval($count), (array)$params);
             return $message; // @ maybe throw exception?
         }
 
@@ -126,9 +126,42 @@ class Translator implements ITranslator
         if (count($exploded) === 1) {
             return $translation;
         }
-
+        foreach ($exploded as $value) {
+            $translationPlural = $this->findSpecialFormat($value, $count);
+            if ($translationPlural) {
+                return $translationPlural;
+            }
+        }
         $pluralForm = PluralForm::get($count, $lang);
         return isset($exploded[$pluralForm]) ? $exploded[$pluralForm] : $exploded[0];
+    }
+
+    /**
+     * example: '{0} používateľov|{1}používateľ|[2,4] používatelia|[5,Inf] používateľov';
+     * @param string $translationForm
+     * @param int $count
+     * @return string|null
+     */
+    private function findSpecialFormat(string $translationForm, int $count): ?string
+    {
+        $foundCount = strtok($translationForm, '{}');
+        if ($foundCount !== $translationForm) {
+            $translationForm = str_replace('{' . $foundCount . '}', '', $translationForm);
+            if ($foundCount === $count) {
+                return $translationForm;
+            }
+        }
+        $foundCount = strtok($translationForm, '[]');
+        if ($foundCount !== $translationForm) {
+            $translationForm = str_replace('[' . $foundCount . ']', '', $translationForm);
+            $foundCountArray = explode(',', $foundCount);
+            $from = (int)$foundCountArray[0];
+            $to = $foundCountArray[1] === 'Inf' ? PHP_INT_MAX : (int)$foundCountArray[1];
+            if ($from <= $count && $count <= $to) {
+                return $translationForm;
+            }
+        }
+        return null;
     }
 
     /**
