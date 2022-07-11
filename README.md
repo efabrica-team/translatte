@@ -74,6 +74,10 @@ Example of count syntax:
 sk: '1|2-4|0,5-Inf'
 cz: '1|2-4|0,5-Inf'
 en: '1|0,2-Inf'
+
+Example of special count syntax (https://symfony.com/doc/3.1/components/translation/usage.html#pluralization):
+en: '[-Inf,-10]big negative count|]-10,0[negative count|{0}zero count|{1}one count|{2,3,4}two,three,four count|]4,Inf]more than four count' 
+sk: '[-Inf,-10]veľký negatívny počet|]-10,0[negatívny počet|{0}nula počet|{1}jedna počet|{2,3,4}dva,tri,štyri počet|]4,Inf]viac ako štyri počet' 
 ```
 
 **index.php**:
