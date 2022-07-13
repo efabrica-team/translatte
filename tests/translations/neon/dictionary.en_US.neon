@@ -27,6 +27,10 @@ app:
         articles_count: article|articles
         articles_count_with_placeholder: %count% article|%count% articles
         articles_count_with_params: article in category %category% and section %section%|articles in category %category% and section %section%|
+        count_special_format: '[-Inf,-10]big negative count|]-10,0[negative count|{0}zero count|{1}one count|{2,3,4}two,three,four count|]4,Inf]more than four count'
+        count_special_format_with_placeholder: '[-Inf,-10]%count% - big negative count|]-10,0[%count% - negative count|{0}%count% - zero count|{1}%count% - one count|{2,3,4}%count% - two,three,four count|]4,Inf]%count% - more than four count'
+        count_special_format_with_params: '[-Inf,-10]%title%: %count% - big negative count|]-10,0[%title%: %count% - negative count|{0}%title%: %count% - zero count|{1}%title%: %count% - one count|{2,3,4}%title%: %count% - two,three,four count|]4,Inf]%title%: %count% - more than four count'
+        count_special_format_with_spaces_with_params: '[ - Inf , - 10 ]%title%: %count% - big negative count|] - 10 , 0 [%title%: %count% - negative count|{ 0 }%title%: %count% - zero count|{ 1 }%title%: %count% - one count|{ 2 , 3  , 4 }%title%: %count% - two,three,four count|] 4 , Inf ]%title%: %count% - more than four count'
 
     author:
         are_you_sure_you_want_to_remove_author_authorname: Are you sure you want to remove the author <strong>%authorName%</strong>?

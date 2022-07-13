@@ -27,6 +27,10 @@ app:
         articles_count: článok|články|článkov
         articles_count_with_placeholder: %count% článok|%count% články|%count% článkov
         articles_count_with_params: článok v kategórii %category% a sekcii %section%|články v kategórii %category% a sekcii %section%|článkov v kategórii %category% a sekcii %section%
+        count_special_format: '[-Inf,-10]veľký negatívny počet|]-10,0[negatívny počet|{0}nula počet|{1}jedna počet|{2,3,4}dva,tri,štyri počet|]4,Inf]viac ako štyri počet'
+        count_special_format_with_placeholder: '[-Inf,-10]%count% - veľký negatívny počet|]-10,0[%count% - negatívny počet|{0}%count% - nula počet|{1}%count% - jedna počet|{2,3,4}%count% - dva,tri,štyri počet|]4,Inf]%count% - viac ako štyri počet'
+        count_special_format_with_params: '[-Inf,-10]%title%: %count% - veľký negatívny počet|]-10,0[%title%: %count% - negatívny počet|{0}%title%: %count% - nula počet|{1}%title%: %count% - jedna počet|{2,3,4}%title%: %count% - dva,tri,štyri počet|]4,Inf]%title%: %count% - viac ako štyri počet'
+        count_special_format_with_spaces_with_params: '[ - Inf , -10 ]%title%: %count% - veľký negatívny počet|] - 10 , 0 [%title%: %count% - negatívny počet|{ 0 }%title%: %count% - nula počet|{ 1 }%title%: %count% - jedna počet|{ 2 , 3 ,  4 }%title%: %count% - dva,tri,štyri počet|] 4 , Inf ]%title%: %count% - viac ako štyri počet'
 
     author:
         are_you_sure_you_want_to_remove_author_authorname: Naozaj chcete odstrániť autora <strong>%authorName%</strong>?

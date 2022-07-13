@@ -18,7 +18,7 @@ class Translator implements ITranslator
     /** @var string */
     private $defaultLang;
 
-    /** @var string  */
+    /** @var string */
     private $lang;
 
     /** @var IResolver */
@@ -80,12 +80,12 @@ class Translator implements ITranslator
         // translate($message, int $count, array $params, string $lang = null)
         // translate($message, array $params, string $lang = null)
 
-        $message = (string) $message;
+        $message = (string)$message;
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
         // If wrong input arguments passed, return message key
         if (!is_int($count) || !is_array($params) || !is_string($lang)) {
-            Arrays::invoke($this->onTranslate, $this, $message, $message, $lang, (int) strval($count), (array) $params);
+            Arrays::invoke($this->onTranslate, $this, $message, $message, $lang, (int)strval($count), (array)$params);
             return $message; // @ maybe throw exception?
         }
 
@@ -126,9 +126,52 @@ class Translator implements ITranslator
         if (count($exploded) === 1) {
             return $translation;
         }
-
+        foreach ($exploded as $value) {
+            $translationPlural = $this->findSpecialFormat($value, $count);
+            if ($translationPlural !== null) {
+                return $translationPlural;
+            }
+        }
         $pluralForm = PluralForm::get($count, $lang);
-        return isset($exploded[$pluralForm]) ? $exploded[$pluralForm] : $exploded[0];
+        return $exploded[$pluralForm] ?? $exploded[0];
+    }
+
+    private function findSpecialFormat(string $translationForm, int $count): ?string
+    {
+        preg_match('/^\{ *[\d, ]+ *\}/', $translationForm, $result);
+        $match = reset($result);
+        if (!empty($match)) {
+            $translationForm = str_replace($match, '', $translationForm);
+            $match = str_replace(['{', '}', ' '], '', trim($match));
+            $foundCountArray = explode(',', $match);
+            foreach ($foundCountArray as $foundCount) {
+                if ($count === (int)$foundCount) {
+                    return $translationForm;
+                }
+            }
+        }
+        preg_match('/^[\[,\]] *[+,-]? *[\d,Inf]+ *, *[+,-]? *[\d,Inf]+ *[\[,\]]/', $translationForm, $result);
+        $match = reset($result);
+        if (!empty($match)) {
+            $startChar = substr($match, 0, 1);
+            $endChar = substr($match, -1);
+            $translationForm = str_replace($match, '', $translationForm);
+            $range = substr($match, 1, strlen($match) - 2);
+            $rangeArray = explode(',', $range);
+            $fromRaw = str_replace(' ', '', $rangeArray[0]);
+            $toRaw = str_replace(' ', '', $rangeArray[1]);
+            $from = $fromRaw === '-Inf' ? PHP_INT_MIN : (int)$fromRaw;
+            $to = ($toRaw === 'Inf' || $toRaw === '+Inf') ? PHP_INT_MAX : (int)$toRaw;
+            if (
+                ($startChar === '[' && $endChar === ']' && $from <= $count && $count <= $to) ||
+                ($startChar === ']' && $endChar === ']' && $from < $count && $count <= $to) ||
+                ($startChar === ']' && $endChar === '[' && $from < $count && $count < $to) ||
+                ($startChar === '[' && $endChar === '[' && $from <= $count && $count < $to)
+            ) {
+                return $translationForm;
+            }
+        }
+        return null;
     }
 
     /**
