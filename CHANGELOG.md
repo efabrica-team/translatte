@@ -1,6 +1,8 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+#### Fixed
+- fix translate parameters if first is null
 
 ### [1.1.0] - 2022-05-19
 #### Added
