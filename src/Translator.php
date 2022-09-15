@@ -214,12 +214,12 @@ class Translator implements ITranslator
         }
 
         $params = array_key_exists(1, $parameters) ? $parameters[1] : [];
-        if (!isset($params['count'])) {
+        if ($parameters[0] && !isset($params['count'])) {
             $params['count'] = $parameters[0];
         }
 
         return [
-            'count' => $parameters[0],
+            'count' => $parameters[0] ?? 1,
             'params' => $params,
             'lang' => array_key_exists(2, $parameters) ? $parameters[2] : $this->getResolvedLang()
         ];
