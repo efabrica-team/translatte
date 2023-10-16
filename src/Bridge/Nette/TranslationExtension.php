@@ -11,6 +11,7 @@ use Nette\Application\UI\ITemplateFactory;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\Statement;
+use Nette\DI\DynamicParameter;
 use Nette\DI\ServiceDefinition;
 use Nette\Localization\ITranslator;
 use Nette\Schema\Expect;
@@ -24,7 +25,7 @@ class TranslationExtension extends CompilerExtension
             'default' => Expect::string()->required(),
             'fallback' => Expect::arrayOf('string'),
             'dirs' => Expect::arrayOf('string'),
-            'cache' => Expect::type(Statement::class),
+            'cache' => Expect::anyOf(Expect::type(Statement::class), Expect::type(DynamicParameter::class)),
             'resolvers' => Expect::arrayOf(Statement::class),
             'resources' => Expect::arrayOf(Statement::class)
         ]);
