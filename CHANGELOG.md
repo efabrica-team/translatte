@@ -1,6 +1,7 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+- fixed compatibility with nette/di 3.1.6
 
 ### [1.1.1] - 2022-05-19
 #### Fixed
@@ -22,4 +23,3 @@
 [1.1.0]: https://github.com/efabrica-team/translatte/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/efabrica-team/translatte/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/efabrica-team/translatte/compare/fc25eea480a9bf9d73361d1eba0d755480486694...1.0.0
-
