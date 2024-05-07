@@ -2,6 +2,9 @@
 
 ## [Unreleased][unreleased]
 
+### Fixed
+- TranslationExtension: Removed setType() for Translator
+
 ## [1.2.0] - 2023-10-27
 ### Added
 - fixed compatibility with nette/di 3.1.6
