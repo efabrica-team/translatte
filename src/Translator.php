@@ -27,7 +27,7 @@ class Translator implements ITranslator
     /** @var ICache */
     private $cache;
 
-    /** @var array */
+    /** @var IResource[] */
     private $resources = [];
 
     /** @var array */
@@ -259,13 +259,13 @@ class Translator implements ITranslator
         foreach ($this->resources as $resource) {
             $dictionaries = $resource->load($lang);
             foreach ($dictionaries as $dictionary) {
-                $this->cache->store($lang, $dictionary->getRecords());
                 if (!$dictionary instanceof Dictionary) {
                     throw new InvalidArgumentException(sprintf('%s expected. Resource returned %s', Dictionary::class, get_class($dictionary)));
                 }
                 $this->dictionaries[$lang]->extend($dictionary);
             }
         }
+        $this->cache->store($lang, $this->dictionaries[$lang]->getRecords());
 
         return $this->dictionaries[$lang];
     }
