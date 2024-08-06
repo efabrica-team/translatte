@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased][unreleased]
+### Fixed
+- Fix empty resources
 
 ## [1.2.0] - 2023-10-27
 ### Added
