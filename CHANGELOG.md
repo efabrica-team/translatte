@@ -1,6 +1,8 @@
 # Change Log
 
-## [Unreleased][unreleased]
+## [Unreleased]
+
+## [1.2.1] - 2024-08-06
 ### Fixed
 - Fix cache storage in foreach
 
@@ -24,7 +26,8 @@
 ## [1.0.0] - 2019-04-26
 - first released version
 
-[unreleased]: https://github.com/efabrica-team/translatte/compare/1.2.0...master
+[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.2.1...master
+[1.2.1]: https://github.com/efabrica-team/translatte/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/efabrica-team/translatte/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/efabrica-team/translatte/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/efabrica-team/translatte/compare/1.0.1...1.1.0
