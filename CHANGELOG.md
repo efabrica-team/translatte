@@ -2,7 +2,7 @@
 
 ## [Unreleased][unreleased]
 ### Fixed
-- Fix empty resources
+- Fix cache storage in foreach
 
 ## [1.2.0] - 2023-10-27
 ### Added

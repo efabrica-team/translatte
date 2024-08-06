@@ -256,18 +256,16 @@ class Translator implements ITranslator
         }
 
         $this->dictionaries[$lang] = new Dictionary($lang);
-        if (!empty($this->resources)) {
-            foreach ($this->resources as $resource) {
-                $dictionaries = $resource->load($lang);
-                foreach ($dictionaries as $dictionary) {
-                    $this->cache->store($lang, $dictionary->getRecords());
-                    if (!$dictionary instanceof Dictionary) {
-                        throw new InvalidArgumentException(sprintf('%s expected. Resource returned %s', Dictionary::class, get_class($dictionary)));
-                    }
-                    $this->dictionaries[$lang]->extend($dictionary);
+        foreach ($this->resources as $resource) {
+            $dictionaries = $resource->load($lang);
+            foreach ($dictionaries as $dictionary) {
+                if (!$dictionary instanceof Dictionary) {
+                    throw new InvalidArgumentException(sprintf('%s expected. Resource returned %s', Dictionary::class, get_class($dictionary)));
                 }
+                $this->dictionaries[$lang]->extend($dictionary);
             }
         }
+        $this->cache->store($lang, $this->dictionaries[$lang]->getRecords());
 
         return $this->dictionaries[$lang];
     }
