@@ -269,4 +269,10 @@ class Translator implements ITranslator
 
         return $this->dictionaries[$lang];
     }
+
+    public function reset(): void
+    {
+        $this->resources = [];
+        $this->dictionaries = [];
+    }
 }
