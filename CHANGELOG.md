@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## [1.3.0] - 2024-11-04
 ### Added
 - Added reset function to Translator
 
@@ -28,7 +30,8 @@
 ## [1.0.0] - 2019-04-26
 - first released version
 
-[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.2.1...master
+[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.3.0...master
+[1.3.0]: https://github.com/efabrica-team/translatte/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/efabrica-team/translatte/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/efabrica-team/translatte/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/efabrica-team/translatte/compare/1.1.0...1.1.1
