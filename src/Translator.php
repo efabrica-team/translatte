@@ -273,7 +273,6 @@ class Translator implements ITranslator
     public function reset(): void
     {
         $this->fallbackLanguages = [];
-        $this->onTranslate = [];
         $this->resources = [];
         $this->dictionaries = [];
     }
