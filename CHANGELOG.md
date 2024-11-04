@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Added reset function to Translator
 
 ## [1.2.1] - 2024-08-06
 ### Fixed
