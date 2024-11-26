@@ -45,7 +45,6 @@ class TranslationExtension extends CompilerExtension
         }
 
         $translator = $builder->addDefinition($this->prefix('translator'))
-            ->setType(ITranslator::class)
             ->setFactory(Translator::class, $params);
 
         // Configure translator
