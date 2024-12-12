@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte\Bridge\Nette;
 
+use Efabrica\Translatte\Latte\TranslateMacros;
 use Efabrica\Translatte\Resolver\ChainResolver;
 use Efabrica\Translatte\Resource\NeonDirectoryResource;
 use Efabrica\Translatte\Translator;
@@ -14,6 +15,7 @@ use Nette\DI\Definitions\Statement;
 use Nette\DI\DynamicParameter;
 use Nette\DI\ServiceDefinition;
 use Nette\Localization\ITranslator;
+use Nette\PhpGenerator\PhpLiteral;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 
@@ -81,7 +83,9 @@ class TranslationExtension extends CompilerExtension
             /** @var FactoryDefinition $latteFactory */
             $latteFactory = $builder->getDefinition('latte.latteFactory');
             $latteFactory->getResultDefinition()
-                ->addSetup('addProvider', ['translator', $builder->getDefinition($this->prefix('translator'))]);
+                ->addSetup('addProvider', ['translator', $builder->getDefinition($this->prefix('translator'))])
+                ->addSetup('?->onCompile[] = function($engine) { ?::install($engine->getCompiler()); }', ['@self', new PhpLiteral(TranslateMacros::class)]);
         }
     }
+
 }
