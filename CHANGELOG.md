@@ -1,11 +1,6 @@
 # Change Log
 
 ## [Unreleased]
-
-## [1.3.1] - 2024-12-12
-### Fixed
-- Added translate macro {_} without quotes translations in latte
-
 ## [1.3.0] - 2024-11-04
 ### Added
 - Added reset function to Translator
