@@ -15,6 +15,10 @@ use Nette\Utils\Arrays;
 
 class Translator implements ITranslator
 {
+    public const PLURAL_DELIMITER = '|';
+    public const PLURAL_DELIMITER_ESCAPED = '\|';
+    public const PLURAL_DELIMITER_TMP = '_PLURAL_DELIMITER_';
+
     /** @var string */
     private $defaultLang;
 
@@ -106,7 +110,9 @@ class Translator implements ITranslator
             }
         }
 
+        $translation = $this->fixEscapedDelimiter($translation);
         $translation = $this->selectRightPluralForm($translation, $lang, $count);
+        $translation = $this->fixBackEscapedDelimiter($translation);
         $translation = $this->replaceParams($translation, $params);
 
         Arrays::invoke($this->onTranslate, $this, $message, $translation, $lang, $count, $params);
@@ -134,6 +140,16 @@ class Translator implements ITranslator
         }
         $pluralForm = PluralForm::get($count, $lang);
         return $exploded[$pluralForm] ?? $exploded[0];
+    }
+
+    private function fixEscapedDelimiter(string $translation): string
+    {
+        return str_replace(self::PLURAL_DELIMITER_ESCAPED, self::PLURAL_DELIMITER_TMP, $translation);
+    }
+
+    private function fixBackEscapedDelimiter(string $translation): string
+    {
+        return str_replace(self::PLURAL_DELIMITER_TMP, self::PLURAL_DELIMITER, $translation);
     }
 
     private function findSpecialFormat(string $translationForm, int $count): ?string

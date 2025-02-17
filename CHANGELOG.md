@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Added possibility to escape delimiter key: '|' in translates. For example: "Page not found\|404"
 
 ## [1.3.0] - 2024-11-04
 ### Added
