@@ -4,9 +4,6 @@
 ### Added
 - Support latte 2 and 3
 
-### Fixed
-- Fix support nette v 3
-
 ## [1.3.0] - 2024-11-04
 ### Added
 - Added reset function to Translator
