@@ -8,13 +8,13 @@ use Efabrica\Translatte\Latte\TranslateMacros;
 use Efabrica\Translatte\Resolver\ChainResolver;
 use Efabrica\Translatte\Resource\NeonDirectoryResource;
 use Efabrica\Translatte\Translator;
+use Latte\Engine;
 use Nette\Application\UI\ITemplateFactory;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\Statement;
 use Nette\DI\DynamicParameter;
 use Nette\DI\ServiceDefinition;
-use Nette\Localization\ITranslator;
 use Nette\PhpGenerator\PhpLiteral;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
@@ -82,8 +82,11 @@ class TranslationExtension extends CompilerExtension
             /** @var FactoryDefinition $latteFactory */
             $latteFactory = $builder->getDefinition('latte.latteFactory');
             $latteFactory->getResultDefinition()
-                ->addSetup('addProvider', ['translator', $builder->getDefinition($this->prefix('translator'))])
-                ->addSetup('?->onCompile[] = function($engine) { ?::install($engine->getCompiler()); }', ['@self', new PhpLiteral(TranslateMacros::class)]);
+                ->addSetup('addProvider', ['translator', $builder->getDefinition($this->prefix('translator'))]);
+
+            if (version_compare(Engine::VERSION, '3', '<')) {
+                $latteFactory->getResultDefinition()->addSetup('?->onCompile[] = function($engine) { ?::install($engine->getCompiler()); }', ['@self', new PhpLiteral(TranslateMacros::class)]);
+            }
         }
     }
 

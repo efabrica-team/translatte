@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Added
+- Support latte 2 and 3
 
 ## [1.4.0] - 2025-02-17
 ### Added

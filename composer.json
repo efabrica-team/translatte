@@ -9,7 +9,7 @@
         "nette/utils": "^3.0|^4.0",
         "nette/finder": "^2.5|^3.0",
         "nette/neon": "^3.0",
-        "latte/latte": "^2.11"
+        "latte/latte": "^2.11 || ^3.0"
     },
     "require-dev": {
         "nette/application": "^3.0",
