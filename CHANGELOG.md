@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+## Fixed
+- Fix support nette v 3
 
 ## [1.3.0] - 2024-11-04
 ### Added
