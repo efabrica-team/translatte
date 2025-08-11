@@ -29,7 +29,8 @@ class TranslationExtension extends CompilerExtension
             'dirs' => Expect::arrayOf('string'),
             'cache' => Expect::anyOf(Expect::type(Statement::class), Expect::type(DynamicParameter::class)),
             'resolvers' => Expect::arrayOf(Statement::class),
-            'resources' => Expect::arrayOf(Statement::class)
+            'resources' => Expect::arrayOf(Statement::class),
+            'recordTranslate' => Expect::anyOf(Expect::type(Statement::class), Expect::type(DynamicParameter::class)),
         ]);
     }
 
@@ -44,6 +45,9 @@ class TranslationExtension extends CompilerExtension
         }
         if ($this->config->cache) {
             $params['cache'] = $this->config->cache;
+        }
+        if ($this->config->recordTranslate) {
+            $params['recordTranslate'] = $this->config->recordTranslate;
         }
 
         $translator = $builder->addDefinition($this->prefix('translator'))
@@ -89,5 +93,4 @@ class TranslationExtension extends CompilerExtension
             }
         }
     }
-
 }
