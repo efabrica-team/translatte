@@ -50,9 +50,9 @@ class Translator implements ITranslator
 
     public function __construct(
         string $defaultLang,
-        RecordInterface $recordTranslate = null,
         IResolver $resolver = null,
-        ICache $cache = null
+        ICache $cache = null,
+        RecordInterface $recordTranslate = null
     ) {
         $this->defaultLang = $defaultLang;
         $this->resolver = $resolver ?: new StaticResolver($defaultLang);
