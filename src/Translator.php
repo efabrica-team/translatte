@@ -92,7 +92,9 @@ class Translator implements ITranslator
         // translate($message, array $params, string $lang = null)
 
         $message = (string)$message;
+
         $this->recordTranslate->save($message);
+
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
         // If wrong input arguments passed, return message key
