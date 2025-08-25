@@ -92,6 +92,7 @@ class Translator implements ITranslator
         // translate($message, array $params, string $lang = null)
 
         $message = (string)$message;
+        $this->recordTranslate->save($message);
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
         // If wrong input arguments passed, return message key
@@ -118,7 +119,6 @@ class Translator implements ITranslator
             }
         }
 
-        $this->recordTranslate->save($message);
         $translation = $this->fixEscapedDelimiter($translation);
         $translation = $this->selectRightPluralForm($translation, $lang, $count);
         $translation = $this->fixBackEscapedDelimiter($translation);
