@@ -1,7 +1,6 @@
 # Change Log
 
 ## [Unreleased]
-
 ### Added
 - Record interface for translate record for statistic
 
