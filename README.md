@@ -56,6 +56,8 @@ translation:
         - Efabrica\Translatte\Resolver\StaticResolver('sk_Sk')
     resources: # optional
         - Efabrica\Translatte\Resource\NeonDirectoryResource(%appDir%/localize)
+    recordTranslate: # optional    
+        -  Efabrica\Translatte\Record\NullRecord()     
 ```
 
 ### Syntactic sugar

@@ -6,6 +6,8 @@ namespace Efabrica\Translatte;
 
 use Efabrica\Translatte\Cache\ICache;
 use Efabrica\Translatte\Cache\NullCache;
+use Efabrica\Translatte\Record\NullRecord;
+use Efabrica\Translatte\Record\RecordInterface;
 use Efabrica\Translatte\Resolver\IResolver;
 use Efabrica\Translatte\Resolver\StaticResolver;
 use Efabrica\Translatte\Resource\IResource;
@@ -43,14 +45,19 @@ class Translator implements ITranslator
     /** @var array */
     public $onTranslate = [];
 
+    /** @var RecordInterface */
+    private $recordTranslate;
+
     public function __construct(
         string $defaultLang,
         IResolver $resolver = null,
-        ICache $cache = null
+        ICache $cache = null,
+        RecordInterface $recordTranslate = null
     ) {
         $this->defaultLang = $defaultLang;
         $this->resolver = $resolver ?: new StaticResolver($defaultLang);
         $this->cache = $cache ?: new NullCache();
+        $this->recordTranslate = $recordTranslate ?: new NullRecord();
     }
 
     /**
@@ -85,6 +92,9 @@ class Translator implements ITranslator
         // translate($message, array $params, string $lang = null)
 
         $message = (string)$message;
+
+        $this->recordTranslate->save($message);
+
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
         // If wrong input arguments passed, return message key
@@ -94,6 +104,7 @@ class Translator implements ITranslator
         }
 
         $translation = $this->getDictionary($lang)->findTranslation($message);
+
         if ($translation === null) {
             // Try find translation in fallback languages
             foreach ($this->fallbackLanguages as $fallbackLanguage) {
@@ -178,8 +189,7 @@ class Translator implements ITranslator
             $toRaw = str_replace(' ', '', $rangeArray[1]);
             $from = $fromRaw === '-Inf' ? PHP_INT_MIN : (int)$fromRaw;
             $to = ($toRaw === 'Inf' || $toRaw === '+Inf') ? PHP_INT_MAX : (int)$toRaw;
-            if (
-                ($startChar === '[' && $endChar === ']' && $from <= $count && $count <= $to) ||
+            if (($startChar === '[' && $endChar === ']' && $from <= $count && $count <= $to) ||
                 ($startChar === ']' && $endChar === ']' && $from < $count && $count <= $to) ||
                 ($startChar === ']' && $endChar === '[' && $from < $count && $count < $to) ||
                 ($startChar === '[' && $endChar === '[' && $from <= $count && $count < $to)
@@ -217,7 +227,7 @@ class Translator implements ITranslator
             return [
                 'count' => 1,
                 'params' => ['count' => 1],
-                'lang' => $this->getResolvedLang()
+                'lang' => $this->getResolvedLang(),
             ];
         }
 
@@ -225,7 +235,7 @@ class Translator implements ITranslator
             return [
                 'count' => isset($parameters[0]['count']) ? $parameters[0]['count'] : 1,
                 'params' => $parameters[0],
-                'lang' => array_key_exists(1, $parameters) ? $parameters[1] : $this->getResolvedLang()
+                'lang' => array_key_exists(1, $parameters) ? $parameters[1] : $this->getResolvedLang(),
             ];
         }
 
@@ -237,7 +247,7 @@ class Translator implements ITranslator
         return [
             'count' => $parameters[0] ?? 1,
             'params' => $params,
-            'lang' => array_key_exists(2, $parameters) ? $parameters[2] : $this->getResolvedLang()
+            'lang' => array_key_exists(2, $parameters) ? $parameters[2] : $this->getResolvedLang(),
         ];
     }
 

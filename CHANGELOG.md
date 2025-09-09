@@ -1,8 +1,8 @@
 # Change Log
 
 ## [Unreleased]
-
-
+### Added
+- Record interface for translate record for statistic
 
 ## [1.5.0] - 2025-03-24
 ### Added
