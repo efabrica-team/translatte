@@ -1,6 +1,10 @@
 # Change Log
 
 ## [Unreleased]
+
+
+
+## [1.6.0] - 2025-09-09
 ### Added
 - Record interface for translate record for statistic
 
@@ -43,7 +47,8 @@
 ## [1.0.0] - 2019-04-26
 - first released version
 
-[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.5.0...master
+[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.6.0...master
+[1.6.0]: https://github.com/efabrica-team/translatte/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/efabrica-team/translatte/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/efabrica-team/translatte/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/efabrica-team/translatte/compare/1.2.1...1.3.0
