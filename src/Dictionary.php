@@ -7,7 +7,7 @@ namespace Efabrica\Translatte;
 use Efabrica\Translatte\Helper\Arr;
 use InvalidArgumentException;
 
-class Dictionary
+final class Dictionary
 {
     private $lang;
 

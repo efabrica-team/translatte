@@ -1,8 +1,7 @@
 # Change Log
 
 ## [Unreleased]
-
-
+- Upgrade to php8.4
 
 ## [1.6.0] - 2025-09-09
 ### Added

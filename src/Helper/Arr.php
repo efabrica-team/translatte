@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte\Helper;
 
-class Arr
+final class Arr
 {
     public static function flatten(array $array, string $prefix = ''): array
     {

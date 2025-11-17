@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Efabrica\Translatte\Resource;
 
 use Nette\Utils\Finder;
+use SplFileInfo;
 
-class NeonDirectoryResource implements IResource
+final class NeonDirectoryResource implements IResource
 {
-    /** @var array */
-    private $directories;
+    private array $directories;
 
-    /** @var array */
-    private $ignoredPrefixes;
+    private array $ignoredPrefixes;
 
     public function __construct(array $directories, array $ignoredPrefixes = ['messages'])
     {
@@ -23,16 +22,22 @@ class NeonDirectoryResource implements IResource
     public function load(string $lang): array
     {
         $directories = [];
+        /** @var SplFileInfo $file */
+        foreach (Finder::find('*.*.neon')->from(...$this->directories) as $file) {
+            $matchCount = preg_match(
+                '~^(?P<prefix>.*?)\.(?P<lang>[^\.]+)\.(?P<format>[^\.]+)$~',
+                $file->getFilename(),
+                $matches
+            );
 
-        foreach (Finder::find('*.*.neon')->from($this->directories) as $file) {
-            if (!preg_match('~^(?P<prefix>.*?)\.(?P<lang>[^\.]+)\.(?P<format>[^\.]+)$~', $file->getFilename(), $matches)) {
+            if ($matchCount !== 1) {
                 continue;
             }
 
-            $resource = new NeonResource($file->getPathname(), $matches['lang'], in_array($matches['prefix'], $this->ignoredPrefixes) ? '' : $matches['prefix'] . '.');
-            $directories = array_merge($directories, $resource->load($lang));
+            $resource = new NeonResource($file->getPathname(), $matches['lang'], in_array($matches['prefix'], $this->ignoredPrefixes, true) ? '' : $matches['prefix'] . '.');
+            $directories[] = $resource->load($lang);
         }
 
-        return $directories;
+        return array_merge(...$directories);
     }
 }

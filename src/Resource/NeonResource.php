@@ -8,7 +8,7 @@ use Efabrica\Translatte\Dictionary;
 use Efabrica\Translatte\Helper\Arr;
 use Nette\Neon\Neon;
 
-class NeonResource implements IResource
+final class NeonResource implements IResource
 {
     /** @var string */
     private $filepath;
@@ -39,6 +39,10 @@ class NeonResource implements IResource
         }
 
         $records = Neon::decode($content);
+        if (!is_array($records)) {
+            return [];
+        }
+
         return [new Dictionary($lang, Arr::flatten($records, $this->prefix))];
     }
 }
