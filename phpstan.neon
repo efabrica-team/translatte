@@ -1,5 +1,2 @@
 parameters:
-	#ignoreErrors:
-	#	-
-	#		message: "#Cannot access offset '[a-zA-Z0-9\\_]+' on array|object.#"
-	#		path: %currentWorkingDirectory%/src/Bridge/Nette/TranslationExtension.php
+	ignoreErrors:
