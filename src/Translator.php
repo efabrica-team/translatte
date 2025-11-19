@@ -275,9 +275,9 @@ final class Translator implements ITranslator
             return $this->dictionaries[$lang];
         }
 
-        $dictionaries = $this->cache->load($lang);
-        if ($dictionaries !== null) {
-            $this->dictionaries[$lang] = $dictionaries;
+        $dictionaryCache = $this->cache->load($lang);
+        if ($dictionaryCache !== null) {
+            $this->dictionaries[$lang] = $dictionaryCache;
             return $this->dictionaries[$lang];
         }
 
