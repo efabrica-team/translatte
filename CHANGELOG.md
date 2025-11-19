@@ -1,8 +1,8 @@
 # Change Log
 
 ## [Unreleased]
-
-
+### Fixed
+- Revert final class
 
 ## [1.6.1] - 2025-11-19
 - Upgrade to php8.4
