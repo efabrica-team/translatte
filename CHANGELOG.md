@@ -1,6 +1,10 @@
 # Change Log
 
 ## [Unreleased]
+
+
+
+## [1.6.2] - 2025-11-19
 ### Fixed
 - Revert final class
 
@@ -50,7 +54,8 @@
 ## [1.0.0] - 2019-04-26
 - first released version
 
-[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.6.1...master
+[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.6.2...master
+[1.6.2]: https://github.com/efabrica-team/translatte/compare/1.6.1...1.6.2
 [1.6.1]: https://github.com/efabrica-team/translatte/compare/1.6.0...1.6.1
 [1.6.0]: https://github.com/efabrica-team/translatte/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/efabrica-team/translatte/compare/1.4.0...1.5.0
