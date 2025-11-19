@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use Nette\Localization\ITranslator;
 use Nette\Utils\Arrays;
 
-class Translator implements ITranslator
+final class Translator implements ITranslator
 {
     public const PLURAL_DELIMITER = '|';
     public const PLURAL_DELIMITER_ESCAPED = '\|';
@@ -223,7 +223,7 @@ class Translator implements ITranslator
      */
     private function parseParameters(array $parameters): array
     {
-        if (!count($parameters)) {
+        if (count($parameters) === 0) {
             return [
                 'count' => 1,
                 'params' => ['count' => 1],
@@ -275,9 +275,9 @@ class Translator implements ITranslator
             return $this->dictionaries[$lang];
         }
 
-        $dictionary = $this->cache->load($lang);
-        if ($dictionary !== null) {
-            $this->dictionaries[$lang] = $dictionary;
+        $dictionaryCache = $this->cache->load($lang);
+        if ($dictionaryCache !== null) {
+            $this->dictionaries[$lang] = $dictionaryCache;
             return $this->dictionaries[$lang];
         }
 

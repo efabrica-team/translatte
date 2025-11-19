@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte\Resolver;
 
-class StaticResolver implements IResolver
+final class StaticResolver implements IResolver
 {
     /** @var string */
     private $lang;
