@@ -30,7 +30,7 @@ use Nette\Schema\Schema;
  *     recordTranslate: Statement|DynamicParameter|null
  * }
  */
-final class TranslationExtension extends CompilerExtension
+class TranslationExtension extends CompilerExtension
 {
     public function getConfigSchema(): Schema
     {

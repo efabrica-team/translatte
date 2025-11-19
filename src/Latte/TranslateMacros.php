@@ -10,7 +10,7 @@ use Latte\MacroNode;
 use Latte\Macros\MacroSet;
 use Latte\PhpWriter;
 
-final class TranslateMacros extends MacroSet
+class TranslateMacros extends MacroSet
 {
     public static function install(Compiler $compiler): void
     {
