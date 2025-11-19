@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use Nette\Localization\ITranslator;
 use Nette\Utils\Arrays;
 
-final class Translator implements ITranslator
+class Translator implements ITranslator
 {
     public const PLURAL_DELIMITER = '|';
     public const PLURAL_DELIMITER_ESCAPED = '\|';

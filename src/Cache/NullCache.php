@@ -6,7 +6,7 @@ namespace Efabrica\Translatte\Cache;
 
 use Efabrica\Translatte\Dictionary;
 
-final class NullCache implements ICache
+class NullCache implements ICache
 {
     public function store(string $lang, array $data): void
     {

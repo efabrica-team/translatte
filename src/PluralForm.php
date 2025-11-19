@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte;
 
-final class PluralForm
+class PluralForm
 {
     public static function get(int $number, string $lang): int
     {

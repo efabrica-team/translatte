@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Efabrica\Translatte\Resolver;
 
-final class ChainResolver implements IResolver
+class ChainResolver implements IResolver
 {
     /** @var array */
     private $resolvers;

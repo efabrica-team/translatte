@@ -8,7 +8,7 @@ use Efabrica\Translatte\Dictionary;
 use Efabrica\Translatte\Helper\Arr;
 use Nette\Neon\Neon;
 
-final class NeonResource implements IResource
+class NeonResource implements IResource
 {
     /** @var string */
     private $filepath;

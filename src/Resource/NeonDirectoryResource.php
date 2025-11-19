@@ -7,7 +7,7 @@ namespace Efabrica\Translatte\Resource;
 use Nette\Utils\Finder;
 use SplFileInfo;
 
-final class NeonDirectoryResource implements IResource
+class NeonDirectoryResource implements IResource
 {
     private array $directories;
 
