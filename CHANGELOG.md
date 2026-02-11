@@ -1,8 +1,8 @@
 # Change Log
 
 ## [Unreleased]
-
-
+### Changed
+- Explicitly declared nullable constructor dependencies (potential BC for inheritors)
 
 ## [1.6.2] - 2025-11-19
 ### Fixed
