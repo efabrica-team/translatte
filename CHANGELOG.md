@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+#### Added
+- Added path destination recod in statistic
+
 ### Changed
 - Explicitly declared nullable constructor dependencies (potential BC for inheritors)
 

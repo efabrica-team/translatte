@@ -48,6 +48,15 @@ class Translator implements ITranslator
     /** @var RecordInterface */
     private $recordTranslate;
 
+    /** @var bool */
+    private $recordDestination = false;
+
+    /** @var array<string, string|false> */
+    private $latteSourceCache = [];
+
+    /** @var array<string, array<int, int>> */
+    private $latteLineMarkersCache = [];
+
     public function __construct(
         string $defaultLang,
         ?IResolver $resolver = null,
@@ -67,6 +76,15 @@ class Translator implements ITranslator
     public function setFallbackLanguages(array $fallbackLanguages): void
     {
         $this->fallbackLanguages = $fallbackLanguages;
+    }
+
+    /**
+     * When enabled, the file (and line) each translation was requested from
+     * is resolved and passed to the record translate service.
+     */
+    public function setRecordDestination(bool $recordDestination): void
+    {
+        $this->recordDestination = $recordDestination;
     }
 
     /**
@@ -93,7 +111,11 @@ class Translator implements ITranslator
 
         $message = (string)$message;
 
-        $this->recordTranslate->save($message);
+        if ($this->recordDestination && !$this->recordTranslate instanceof NullRecord) {
+            $this->recordTranslate->save($message, $this->resolveDestination());
+        } else {
+            $this->recordTranslate->save($message);
+        }
 
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
@@ -128,6 +150,89 @@ class Translator implements ITranslator
 
         Arrays::invoke($this->onTranslate, $this, $message, $translation, $lang, $count, $params);
         return $translation;
+    }
+
+    /**
+     * Resolve file (and line if available) the translation was requested from.
+     * @return array{file: string, line: int|null}|null null when the caller cannot be resolved
+     */
+    private function resolveDestination(): ?array
+    {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
+        $fallback = null;
+        foreach ($backtrace as $frame) {
+            if (!isset($frame['file']) || $frame['file'] === __FILE__) {
+                continue;
+            }
+            if ($fallback === null) {
+                $fallback = $frame;
+            }
+            // frames inside vendor (latte runtime, nette bridges, ...) are not the real caller
+            if (strpos($frame['file'], DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) !== false) {
+                continue;
+            }
+            return $this->formatDestination($frame);
+        }
+        return $fallback !== null ? $this->formatDestination($fallback) : null;
+    }
+
+    /**
+     * @return array{file: string, line: int|null}
+     */
+    private function formatDestination(array $frame): array
+    {
+        $latteSource = $this->resolveLatteSource($frame['file']);
+        if ($latteSource !== null) {
+            $line = isset($frame['line']) ? $this->resolveLatteSourceLine($frame['file'], (int)$frame['line']) : null;
+            return ['file' => $latteSource, 'line' => $line];
+        }
+        return ['file' => $frame['file'], 'line' => $frame['line'] ?? null];
+    }
+
+    /**
+     * Compiled latte templates contain a "source:" comment pointing to the original .latte file.
+     */
+    private function resolveLatteSource(string $file): ?string
+    {
+        if (array_key_exists($file, $this->latteSourceCache)) {
+            return $this->latteSourceCache[$file] === false ? null : $this->latteSourceCache[$file];
+        }
+        $source = false;
+        $head = @file_get_contents($file, false, null, 0, 512);
+        if ($head !== false
+            && preg_match('~^(?:/\*\*?|//)\s*source:\s*(.+?\.latte)\s*(?:\*/)?\s*$~m', $head, $matches)
+        ) {
+            $source = trim($matches[1]);
+        }
+        $this->latteSourceCache[$file] = $source;
+        return $source === false ? null : $source;
+    }
+
+    /**
+     * Compiled latte statements carry "pos LINE:COL" (Latte 3) or "line LINE" (Latte 2) markers.
+     * Finds the marker closest to the given compiled line and returns the source template line.
+     */
+    private function resolveLatteSourceLine(string $file, int $compiledLine): ?int
+    {
+        if (!array_key_exists($file, $this->latteLineMarkersCache)) {
+            $markers = [];
+            $lines = @file($file);
+            if ($lines !== false) {
+                foreach ($lines as $i => $line) {
+                    if (preg_match('~/\* (?:pos|line) (\d+)~', $line, $matches)) {
+                        $markers[$i + 1] = (int)$matches[1];
+                    }
+                }
+            }
+            $this->latteLineMarkersCache[$file] = $markers;
+        }
+        $markers = $this->latteLineMarkersCache[$file];
+        foreach ([0, 1, 2, 3, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10] as $offset) {
+            if (isset($markers[$compiledLine + $offset])) {
+                return $markers[$compiledLine + $offset];
+            }
+        }
+        return null;
     }
 
     /**

@@ -6,5 +6,5 @@ namespace Efabrica\Translatte\Record;
 
 interface RecordInterface
 {
-    public function save(string $message): void;
+    public function save(string $message, ?array $destination = null): void;
 }
