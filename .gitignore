@@ -1,6 +1,7 @@
 .DS_Store
 .idea/
-vendor/
+vendor/*
+!vendor/autoload.php
 build/
 composer.lock
 .phpunit.result.cache

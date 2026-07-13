@@ -177,6 +177,7 @@ class Translator implements ITranslator
     }
 
     /**
+     * @param array{file: string, line?: int} $frame
      * @return array{file: string, line: int|null}
      */
     private function formatDestination(array $frame): array
