@@ -153,27 +153,67 @@ class Translator implements ITranslator
     }
 
     /**
-     * Resolve file (and line if available) the translation was requested from.
-     * @return array{file: string, line: int|null}|null null when the caller cannot be resolved
+     * Resolve where the translation was requested from: the direct caller (file, line)
+     * and the full call chain (trace, outermost call first) leading to the translate call.
+     * @return array{file: string, line: int|null, trace: array<int, string>}|null null when the caller cannot be resolved
      */
     private function resolveDestination(): ?array
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
+        $trace = [];
+        $direct = null;
         $fallback = null;
         foreach ($backtrace as $frame) {
-            if (!isset($frame['file']) || $frame['file'] === __FILE__) {
+            $file = $frame['file'] ?? null;
+            if ($file === __FILE__) {
                 continue;
             }
-            if ($fallback === null) {
-                $fallback = $frame;
+            if ($file !== null) {
+                if ($fallback === null) {
+                    $fallback = $frame;
+                }
+                // frames inside vendor (latte runtime, nette bridges, ...) are not the real caller
+                if ($direct === null && strpos($file, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) === false) {
+                    $direct = $frame;
+                }
             }
-            // frames inside vendor (latte runtime, nette bridges, ...) are not the real caller
-            if (strpos($frame['file'], DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) !== false) {
-                continue;
+            $step = $this->formatChainStep($frame);
+            if ($step !== null) {
+                $trace[] = $step;
             }
-            return $this->formatDestination($frame);
         }
-        return $fallback !== null ? $this->formatDestination($fallback) : null;
+        $frame = $direct ?? $fallback;
+        if ($frame === null) {
+            return null;
+        }
+        $destination = $this->formatDestination($frame);
+        $destination['trace'] = array_reverse($trace);
+        return $destination;
+    }
+
+    /**
+     * Format one backtrace frame as "file:line Class->function()" — the function
+     * that was called at that place. Latte compiled files are mapped to their source.
+     * @param array{file?: string, line?: int, function?: string, class?: class-string, type?: string} $frame
+     */
+    private function formatChainStep(array $frame): ?string
+    {
+        $function = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+        $file = $frame['file'] ?? null;
+        if ($file === null) {
+            return $function !== '' ? $function . '()' : null;
+        }
+        $line = $frame['line'] ?? null;
+        $latteSource = $this->resolveLatteSource($file);
+        if ($latteSource !== null) {
+            $line = $line !== null ? $this->resolveLatteSourceLine($file, (int)$line) : null;
+            $file = $latteSource;
+        }
+        $step = $file . ($line !== null ? ':' . $line : '');
+        if ($function !== '') {
+            $step .= ' ' . $function . '()';
+        }
+        return $step;
     }
 
     /**
