@@ -1,7 +1,8 @@
 # Change Log
 
 ## [Unreleased]
-#### Added
+## [1.7.0] - 2026-07-21
+### Added
 - Added path destination record in statistic
 
 ### Changed
@@ -57,7 +58,8 @@
 ## [1.0.0] - 2019-04-26
 - first released version
 
-[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.6.2...master
+[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.7.0...master
+[1.7.0]: https://github.com/efabrica-team/translatte/compare/1.6.2...1.7.0
 [1.6.2]: https://github.com/efabrica-team/translatte/compare/1.6.1...1.6.2
 [1.6.1]: https://github.com/efabrica-team/translatte/compare/1.6.0...1.6.1
 [1.6.0]: https://github.com/efabrica-team/translatte/compare/1.5.0...1.6.0
