@@ -21,6 +21,12 @@ class Translator implements ITranslator
     public const PLURAL_DELIMITER_ESCAPED = '\|';
     public const PLURAL_DELIMITER_TMP = '_PLURAL_DELIMITER_';
 
+    /** Hard cap on the recorded call chain length (safety net for CLI/recursive stacks) */
+    private const MAX_CHAIN_STEPS = 60;
+
+    /** How many chain steps to keep past the first application frame (presenter context) */
+    private const CHAIN_STEPS_AFTER_APP_FRAME = 8;
+
     /** @var string */
     private $defaultLang;
 
@@ -56,6 +62,9 @@ class Translator implements ITranslator
 
     /** @var array<string, array<int, int>> */
     private $latteLineMarkersCache = [];
+
+    /** @var string|null|false false = not resolved yet, null = project root not resolvable */
+    private $appDir = false;
 
     public function __construct(
         string $defaultLang,
@@ -155,14 +164,21 @@ class Translator implements ITranslator
     /**
      * Resolve where the translation was requested from: the direct caller (file, line)
      * and the full call chain (trace, outermost call first) leading to the translate call.
+     * The chain is walked without a depth limit so it always reaches application code
+     * (presenter, app template) even through deep rendering stacks; once the first
+     * application frame is included, a few more frames are kept for context and the
+     * rest of the bootstrap (Application::run, index.php) is dropped.
      * @return array{file: string, line: int|null, trace: array<int, string>}|null null when the caller cannot be resolved
      */
     private function resolveDestination(): ?array
     {
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $appDir = $this->resolveAppDir($backtrace);
         $trace = [];
         $direct = null;
+        $nonVendor = null;
         $fallback = null;
+        $stepsAfterAppFrame = 0;
         foreach ($backtrace as $frame) {
             $file = $frame['file'] ?? null;
             if ($file === __FILE__) {
@@ -172,23 +188,65 @@ class Translator implements ITranslator
                 if ($fallback === null) {
                     $fallback = $frame;
                 }
-                // frames inside vendor (latte runtime, nette bridges, ...) are not the real caller
-                if ($direct === null && strpos($file, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) === false) {
+                // application code is the real origin; compiled latte files are checked via their source template
+                $resolvedFile = $this->resolveLatteSource($file) ?? $file;
+                if ($direct === null && $appDir !== null && strpos($resolvedFile, $appDir) === 0) {
                     $direct = $frame;
+                }
+                // frames inside vendor (latte runtime, nette bridges, ...) are not the real caller
+                if ($nonVendor === null && strpos($file, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) === false) {
+                    $nonVendor = $frame;
                 }
             }
             $step = $this->formatChainStep($frame);
             if ($step !== null) {
                 $trace[] = $step;
             }
+            if (count($trace) >= self::MAX_CHAIN_STEPS) {
+                break;
+            }
+            if ($direct !== null && ++$stepsAfterAppFrame > self::CHAIN_STEPS_AFTER_APP_FRAME) {
+                break;
+            }
         }
-        $frame = $direct ?? $fallback;
+        $frame = $direct ?? $nonVendor ?? $fallback;
         if ($frame === null) {
             return null;
         }
         $destination = $this->formatDestination($frame);
         $destination['trace'] = array_reverse($trace);
         return $destination;
+    }
+
+    /**
+     * Application code directory ("<project root>/app/") used to spot the first application
+     * frame in the chain. The project root is the directory containing vendor/ — resolved
+     * from this file's path or, when the package is symlinked (composer path repository),
+     * from the first vendor frame in the backtrace.
+     * @param array<int, array{file?: string}> $backtrace
+     */
+    private function resolveAppDir(array $backtrace): ?string
+    {
+        if ($this->appDir !== false) {
+            return $this->appDir;
+        }
+        $vendorDir = DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR;
+        $root = null;
+        $pos = strpos(__FILE__, $vendorDir);
+        if ($pos !== false) {
+            $root = substr(__FILE__, 0, $pos);
+        } else {
+            foreach ($backtrace as $frame) {
+                $file = $frame['file'] ?? '';
+                $pos = strpos($file, $vendorDir);
+                if ($pos !== false) {
+                    $root = substr($file, 0, $pos);
+                    break;
+                }
+            }
+        }
+        $this->appDir = $root === null ? null : $root . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR;
+        return $this->appDir;
     }
 
     /**
