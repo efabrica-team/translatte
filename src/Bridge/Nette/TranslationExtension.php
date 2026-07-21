@@ -27,7 +27,8 @@ use Nette\Schema\Schema;
  *     cache: Statement|DynamicParameter|null,
  *     resolvers: array<Statement>,
  *     resources: array<Statement>,
- *     recordTranslate: Statement|DynamicParameter|null
+ *     recordTranslate: Statement|DynamicParameter|null,
+ *     recordDestination: bool
  * }
  */
 class TranslationExtension extends CompilerExtension
@@ -42,6 +43,7 @@ class TranslationExtension extends CompilerExtension
             'resolvers' => Expect::arrayOf(Statement::class),
             'resources' => Expect::arrayOf(Statement::class),
             'recordTranslate' => Expect::anyOf(Expect::type(Statement::class), Expect::type(DynamicParameter::class)),
+            'recordDestination' => Expect::bool(false),
         ]);
     }
 
@@ -73,6 +75,9 @@ class TranslationExtension extends CompilerExtension
         }
         if (!empty($config->fallback)) {
             $translator->addSetup('setFallbackLanguages', [$config->fallback]);
+        }
+        if ($config->recordDestination) {
+            $translator->addSetup('setRecordDestination', [true]);
         }
         if (!empty($config->dirs)) {
             $translator->addSetup('addResource', [new Statement(NeonDirectoryResource::class, [$config->dirs])]);

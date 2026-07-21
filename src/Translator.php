@@ -21,6 +21,12 @@ class Translator implements ITranslator
     public const PLURAL_DELIMITER_ESCAPED = '\|';
     public const PLURAL_DELIMITER_TMP = '_PLURAL_DELIMITER_';
 
+    /** Hard cap on the recorded call chain length (safety net for CLI/recursive stacks) */
+    private const MAX_CHAIN_STEPS = 60;
+
+    /** How many chain steps to keep past the first application frame (presenter context) */
+    private const CHAIN_STEPS_AFTER_APP_FRAME = 8;
+
     /** @var string */
     private $defaultLang;
 
@@ -48,6 +54,18 @@ class Translator implements ITranslator
     /** @var RecordInterface */
     private $recordTranslate;
 
+    /** @var bool */
+    private $recordDestination = false;
+
+    /** @var array<string, string|false> */
+    private $latteSourceCache = [];
+
+    /** @var array<string, array<int, int>> */
+    private $latteLineMarkersCache = [];
+
+    /** @var string|null|false false = not resolved yet, null = project root not resolvable */
+    private $appDir = false;
+
     public function __construct(
         string $defaultLang,
         ?IResolver $resolver = null,
@@ -67,6 +85,15 @@ class Translator implements ITranslator
     public function setFallbackLanguages(array $fallbackLanguages): void
     {
         $this->fallbackLanguages = $fallbackLanguages;
+    }
+
+    /**
+     * When enabled, the file (and line) each translation was requested from
+     * is resolved and passed to the record translate service.
+     */
+    public function setRecordDestination(bool $recordDestination): void
+    {
+        $this->recordDestination = $recordDestination;
     }
 
     /**
@@ -93,7 +120,11 @@ class Translator implements ITranslator
 
         $message = (string)$message;
 
-        $this->recordTranslate->save($message);
+        if ($this->recordDestination && !$this->recordTranslate instanceof NullRecord) {
+            $this->recordTranslate->save($message, $this->resolveDestination());
+        } else {
+            $this->recordTranslate->save($message);
+        }
 
         list($count, $params, $lang) = array_values($this->parseParameters($parameters));
 
@@ -128,6 +159,179 @@ class Translator implements ITranslator
 
         Arrays::invoke($this->onTranslate, $this, $message, $translation, $lang, $count, $params);
         return $translation;
+    }
+
+    /**
+     * Resolve where the translation was requested from: the direct caller (file, line)
+     * and the full call chain (trace, outermost call first) leading to the translate call.
+     * The chain is walked without a depth limit so it always reaches application code
+     * (presenter, app template) even through deep rendering stacks; once the first
+     * application frame is included, a few more frames are kept for context and the
+     * rest of the bootstrap (Application::run, index.php) is dropped.
+     * @return array{file: string, line: int|null, trace: array<int, string>}|null null when the caller cannot be resolved
+     */
+    private function resolveDestination(): ?array
+    {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $appDir = $this->resolveAppDir($backtrace);
+        $trace = [];
+        $direct = null;
+        $nonVendor = null;
+        $fallback = null;
+        $stepsAfterAppFrame = 0;
+        foreach ($backtrace as $frame) {
+            $file = $frame['file'] ?? null;
+            if ($file === __FILE__) {
+                continue;
+            }
+            if ($file !== null) {
+                if ($fallback === null) {
+                    $fallback = $frame;
+                }
+                // application code is the real origin; compiled latte files are checked via their source template
+                $resolvedFile = $this->resolveLatteSource($file) ?? $file;
+                if ($direct === null && $appDir !== null && strpos($resolvedFile, $appDir) === 0) {
+                    $direct = $frame;
+                }
+                // frames inside vendor (latte runtime, nette bridges, ...) are not the real caller
+                if ($nonVendor === null && strpos($file, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) === false) {
+                    $nonVendor = $frame;
+                }
+            }
+            $step = $this->formatChainStep($frame);
+            if ($step !== null) {
+                $trace[] = $step;
+            }
+            if (count($trace) >= self::MAX_CHAIN_STEPS) {
+                break;
+            }
+            if ($direct !== null && ++$stepsAfterAppFrame > self::CHAIN_STEPS_AFTER_APP_FRAME) {
+                break;
+            }
+        }
+        $frame = $direct ?? $nonVendor ?? $fallback;
+        if ($frame === null) {
+            return null;
+        }
+        $destination = $this->formatDestination($frame);
+        $destination['trace'] = array_reverse($trace);
+        return $destination;
+    }
+
+    /**
+     * Application code directory ("<project root>/app/") used to spot the first application
+     * frame in the chain. The project root is the directory containing vendor/ — resolved
+     * from this file's path or, when the package is symlinked (composer path repository),
+     * from the first vendor frame in the backtrace.
+     * @param array<int, array{file?: string}> $backtrace
+     */
+    private function resolveAppDir(array $backtrace): ?string
+    {
+        if ($this->appDir !== false) {
+            return $this->appDir;
+        }
+        $vendorDir = DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR;
+        $root = null;
+        $pos = strpos(__FILE__, $vendorDir);
+        if ($pos !== false) {
+            $root = substr(__FILE__, 0, $pos);
+        } else {
+            foreach ($backtrace as $frame) {
+                $file = $frame['file'] ?? '';
+                $pos = strpos($file, $vendorDir);
+                if ($pos !== false) {
+                    $root = substr($file, 0, $pos);
+                    break;
+                }
+            }
+        }
+        $this->appDir = $root === null ? null : $root . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR;
+        return $this->appDir;
+    }
+
+    /**
+     * Format one backtrace frame as "file:line Class->function()" — the function
+     * that was called at that place. Latte compiled files are mapped to their source.
+     * @param array{file?: string, line?: int, function?: string, class?: class-string, type?: string} $frame
+     */
+    private function formatChainStep(array $frame): ?string
+    {
+        $function = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+        $file = $frame['file'] ?? null;
+        if ($file === null) {
+            return $function !== '' ? $function . '()' : null;
+        }
+        $line = $frame['line'] ?? null;
+        $latteSource = $this->resolveLatteSource($file);
+        if ($latteSource !== null) {
+            $line = $line !== null ? $this->resolveLatteSourceLine($file, (int)$line) : null;
+            $file = $latteSource;
+        }
+        $step = $file . ($line !== null ? ':' . $line : '');
+        if ($function !== '') {
+            $step .= ' ' . $function . '()';
+        }
+        return $step;
+    }
+
+    /**
+     * @param array{file: string, line?: int} $frame
+     * @return array{file: string, line: int|null}
+     */
+    private function formatDestination(array $frame): array
+    {
+        $latteSource = $this->resolveLatteSource($frame['file']);
+        if ($latteSource !== null) {
+            $line = isset($frame['line']) ? $this->resolveLatteSourceLine($frame['file'], (int)$frame['line']) : null;
+            return ['file' => $latteSource, 'line' => $line];
+        }
+        return ['file' => $frame['file'], 'line' => $frame['line'] ?? null];
+    }
+
+    /**
+     * Compiled latte templates contain a "source:" comment pointing to the original .latte file.
+     */
+    private function resolveLatteSource(string $file): ?string
+    {
+        if (array_key_exists($file, $this->latteSourceCache)) {
+            return $this->latteSourceCache[$file] === false ? null : $this->latteSourceCache[$file];
+        }
+        $source = false;
+        $head = @file_get_contents($file, false, null, 0, 512);
+        if ($head !== false
+            && preg_match('~^(?:/\*\*?|//)\s*source:\s*(.+?\.latte)\s*(?:\*/)?\s*$~m', $head, $matches)
+        ) {
+            $source = trim($matches[1]);
+        }
+        $this->latteSourceCache[$file] = $source;
+        return $source === false ? null : $source;
+    }
+
+    /**
+     * Compiled latte statements carry "pos LINE:COL" (Latte 3) or "line LINE" (Latte 2) markers.
+     * Finds the marker closest to the given compiled line and returns the source template line.
+     */
+    private function resolveLatteSourceLine(string $file, int $compiledLine): ?int
+    {
+        if (!array_key_exists($file, $this->latteLineMarkersCache)) {
+            $markers = [];
+            $lines = @file($file);
+            if ($lines !== false) {
+                foreach ($lines as $i => $line) {
+                    if (preg_match('~/\* (?:pos|line) (\d+)~', $line, $matches)) {
+                        $markers[$i + 1] = (int)$matches[1];
+                    }
+                }
+            }
+            $this->latteLineMarkersCache[$file] = $markers;
+        }
+        $markers = $this->latteLineMarkersCache[$file];
+        foreach ([0, 1, 2, 3, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10] as $offset) {
+            if (isset($markers[$compiledLine + $offset])) {
+                return $markers[$compiledLine + $offset];
+            }
+        }
+        return null;
     }
 
     /**
