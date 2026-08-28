@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- NeonResource throws when a translation file cannot be read or does not hold a map, instead of returning no records. An empty file still yields an empty dictionary.
+
 ## [1.7.0] - 2026-07-21
 ### Added
 - Added path destination record in statistic
