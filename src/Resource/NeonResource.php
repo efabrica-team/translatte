@@ -7,6 +7,7 @@ namespace Efabrica\Translatte\Resource;
 use Efabrica\Translatte\Dictionary;
 use Efabrica\Translatte\Helper\Arr;
 use Nette\Neon\Neon;
+use RuntimeException;
 
 class NeonResource implements IResource
 {
@@ -34,13 +35,14 @@ class NeonResource implements IResource
 
         $content = @file_get_contents($this->filepath);
         if ($content === false) {
-            // @TODO: exception?
-            return [];
+            throw new RuntimeException(sprintf('Unable to read translation file "%s".', $this->filepath));
         }
 
-        $records = Neon::decode($content);
+        // an empty file is a file with no translations, which is allowed; anything that parses to
+        // a non-map is malformed, and staying silent about it caches the emptiness it produces
+        $records = Neon::decode($content) ?? [];
         if (!is_array($records)) {
-            return [];
+            throw new RuntimeException(sprintf('Translation file "%s" does not contain a map.', $this->filepath));
         }
 
         return [new Dictionary($lang, Arr::flatten($records, $this->prefix))];
