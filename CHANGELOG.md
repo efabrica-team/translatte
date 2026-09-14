@@ -1,10 +1,14 @@
 # Change Log
 
 ## [Unreleased]
+
+## [1.7.1] - 2026-09-14
+
 ### Changed
 - NeonResource throws when a translation file cannot be read or does not hold a map, instead of returning no records. An empty file still yields an empty dictionary.
 
 ## [1.7.0] - 2026-07-21
+
 ### Added
 - Added path destination record in statistic
 
@@ -12,29 +16,36 @@
 - Explicitly declared nullable constructor dependencies (potential BC for inheritors)
 
 ## [1.6.2] - 2025-11-19
+
 ### Fixed
 - Revert final class
 
 ## [1.6.1] - 2025-11-19
+
 - Upgrade to php8.4
 
 ## [1.6.0] - 2025-09-09
+
 ### Added
 - Record interface for translate record for statistic
 
 ## [1.5.0] - 2025-03-24
+
 ### Added
 - Support latte 2 and 3
 
 ## [1.4.0] - 2025-02-17
+
 ### Added
 - Added possibility to escape delimiter key: '|' in translates. For example: "Page not found\|404"
 
 ## [1.3.0] - 2024-11-04
+
 ### Added
 - Added reset function to Translator
 
 ## [1.2.1] - 2024-08-06
+
 ### Fixed
 - Fix cache storage in foreach
 
@@ -42,26 +53,32 @@
 - TranslationExtension: Removed setType() for Translator
 
 ## [1.2.0] - 2023-10-27
+
 ### Added
 - fixed compatibility with nette/di 3.1.6
 - added support for nette/utils ^4.0 and nette/finder ^3.0
 
 ## [1.1.1] - 2022-05-19
+
 ### Fixed
 - fix translate parameters if first is null
 
 ## [1.1.0] - 2022-05-19
+
 ### Added
 - add invoke onTranslate
 
 ## [1.0.1] - 2022-03-04
+
 ### Fixed
 - fix cache store
 
 ## [1.0.0] - 2019-04-26
+
 - first released version
 
-[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.7.0...master
+[Unreleased]: https://github.com/efabrica-team/translatte/compare/1.7.1...master
+[1.7.1]: https://github.com/efabrica-team/translatte/compare/1.7.0...1.7.1
 [1.7.0]: https://github.com/efabrica-team/translatte/compare/1.6.2...1.7.0
 [1.6.2]: https://github.com/efabrica-team/translatte/compare/1.6.1...1.6.2
 [1.6.1]: https://github.com/efabrica-team/translatte/compare/1.6.0...1.6.1
